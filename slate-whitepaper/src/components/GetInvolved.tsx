@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useInView } from 'framer-motion'
 import { BookOpen, MessageCircle, Github, ArrowRight } from 'lucide-react'
 
@@ -32,12 +32,25 @@ const actions = [
 export default function GetInvolved() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  // Predetermined star configurations
+  const starConfigs = Array.from({ length: 50 }, (_, i) => ({
+    left: (i * 7.3) % 100,
+    top: (i * 11.7) % 100,
+    duration: 3 + (i % 3),
+    delay: (i * 0.1) % 2
+  }))
 
   return (
     <section id="get-involved" className="py-20 bg-gray-900 text-white relative overflow-hidden" ref={ref}>
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-10">
-        {[...Array(50)].map((_, i) => (
+        {isClient && starConfigs.map((star, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-white rounded-full"
@@ -46,13 +59,13 @@ export default function GetInvolved() {
               scale: [0, 1, 0],
             }}
             transition={{
-              duration: 3 + Math.random() * 2,
+              duration: star.duration,
               repeat: Infinity,
-              delay: Math.random() * 5,
+              delay: star.delay,
             }}
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: `${star.left}%`,
+              top: `${star.top}%`,
             }}
           />
         ))}

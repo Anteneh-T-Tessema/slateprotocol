@@ -138,7 +138,7 @@ export default function Comparison() {
           font: {
             family: 'Inter, system-ui, sans-serif',
             size: 14,
-            weight: '600'
+            weight: 600
           },
           padding: 20,
           usePointStyle: true,
@@ -180,7 +180,7 @@ export default function Comparison() {
           font: {
             family: 'Inter, system-ui, sans-serif',
             size: 12,
-            weight: '500'
+            weight: 500
           },
           color: '#374151'
         },
@@ -203,7 +203,7 @@ export default function Comparison() {
           font: {
             family: 'Inter, system-ui, sans-serif',
             size: 13,
-            weight: '600'
+            weight: 600
           },
           color: '#374151'
         }
@@ -251,7 +251,7 @@ export default function Comparison() {
             Positioning in the Blockchain Landscape
           </h2>
           <p className="text-xl text-text-secondary max-w-3xl mx-auto leading-relaxed">
-            Slate's <span className="text-accent-primary font-semibold">integrated modularity</span> offers distinct advantages. 
+            Slate&apos;s <span className="text-accent-primary font-semibold">integrated modularity</span> offers distinct advantages. 
             Select a category to see how it compares against leading solutions.
           </p>
         </motion.div>

@@ -64,7 +64,7 @@ export default function WhitepaperSection() {
             The Slate Protocol Whitepaper
           </h2>
           <p className="text-xl text-text-secondary max-w-3xl mx-auto leading-relaxed">
-            A comprehensive technical specification detailing Slate's unified modular architecture, 
+            A comprehensive technical specification detailing Slate&apos;s unified modular architecture, 
             economic model, and path to solving the blockchain trilemma.
           </p>
         </motion.div>
@@ -144,7 +144,7 @@ export default function WhitepaperSection() {
             <div className="mb-8">
               <h3 className="text-3xl font-bold text-text-primary mb-4">Key Highlights</h3>
               <p className="text-text-secondary leading-relaxed">
-                The whitepaper provides comprehensive coverage of Slate's innovative approach to blockchain architecture, 
+                The whitepaper provides comprehensive coverage of Slate&apos;s innovative approach to blockchain architecture, 
                 including detailed technical specifications and economic analysis.
               </p>
             </div>

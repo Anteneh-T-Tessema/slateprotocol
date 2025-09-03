@@ -2,14 +2,37 @@
 
 import { motion } from 'framer-motion'
 import { ArrowRight, Zap, Sparkles, Globe } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 export default function Hero() {
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const scrollToSection = (href: string) => {
     const element = document.getElementById(href.substring(1))
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' })
     }
   }
+
+  // Predetermined orb configurations to avoid hydration mismatch
+  const orbConfigs = [
+    { width: 120, height: 80, left: 10, top: 20, color: '#6366f1', duration: 15 },
+    { width: 90, height: 110, left: 80, top: 10, color: '#8b5cf6', duration: 12 },
+    { width: 70, height: 70, left: 60, top: 70, color: '#06b6d4', duration: 18 },
+    { width: 100, height: 90, left: 30, top: 50, color: '#6366f1', duration: 14 },
+    { width: 85, height: 120, left: 90, top: 60, color: '#8b5cf6', duration: 16 },
+    { width: 110, height: 75, left: 20, top: 80, color: '#06b6d4', duration: 13 },
+    { width: 95, height: 95, left: 70, top: 30, color: '#6366f1', duration: 17 },
+    { width: 75, height: 105, left: 50, top: 90, color: '#8b5cf6', duration: 11 },
+    { width: 130, height: 85, left: 15, top: 40, color: '#06b6d4', duration: 19 },
+    { width: 80, height: 100, left: 85, top: 25, color: '#6366f1', duration: 15 },
+    { width: 105, height: 70, left: 40, top: 15, color: '#8b5cf6', duration: 14 },
+    { width: 90, height: 115, left: 65, top: 85, color: '#06b6d4', duration: 16 }
+  ]
 
   return (
     <section id="hero" className="section-padding min-h-screen flex items-center relative overflow-hidden">
@@ -27,27 +50,25 @@ export default function Hero() {
         </div>
 
         {/* Floating Orbs */}
-        {[...Array(12)].map((_, i) => (
+        {isClient && orbConfigs.map((orb, i) => (
           <motion.div
             key={i}
             className="absolute rounded-full opacity-20"
             style={{
-              width: Math.random() * 100 + 50,
-              height: Math.random() * 100 + 50,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              background: `linear-gradient(135deg, 
-                ${i % 3 === 0 ? '#6366f1' : i % 3 === 1 ? '#8b5cf6' : '#06b6d4'}, 
-                transparent)`
+              width: orb.width,
+              height: orb.height,
+              left: `${orb.left}%`,
+              top: `${orb.top}%`,
+              background: `linear-gradient(135deg, ${orb.color}, transparent)`
             }}
             animate={{
-              x: [0, Math.random() * 200 - 100],
-              y: [0, Math.random() * 200 - 100],
-              scale: [1, 1.2, 1],
+              x: [0, (i % 2 === 0 ? 50 : -50)],
+              y: [0, (i % 3 === 0 ? 30 : -30)],
+              scale: [1, 1.1, 1],
               rotate: [0, 360],
             }}
             transition={{
-              duration: 10 + Math.random() * 10,
+              duration: orb.duration,
               repeat: Infinity,
               ease: "easeInOut",
               delay: Math.random() * 5,

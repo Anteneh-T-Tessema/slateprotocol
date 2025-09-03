@@ -11,7 +11,7 @@
 [![Discord](https://img.shields.io/discord/1234567890?color=7289da&label=Discord&logo=discord&logoColor=white)](https://discord.gg/slate-protocol)
 [![GitHub Stars](https://img.shields.io/github/stars/Anteneh-T-Tessema/slateprotocol?style=social)](https://github.com/Anteneh-T-Tessema/slateprotocol/stargazers)
 
-[🚀 **Interactive Whitepaper**](./slate-whitepaper/) | [📖 **Documentation**](#documentation) | [💬 **Join Discord**](https://discord.gg/slate-protocol) | [🛠️ **Contribute**](./CONTRIBUTING.md)
+[🚀 **Interactive Whitepaper**](https://slate-whitepaper-h5uf8dba4.vercel.app) | [📖 **Documentation**](#documentation) | [💬 **Join Discord**](https://discord.gg/slate-protocol) | [🛠️ **Contribute**](./CONTRIBUTING.md)
 
 </div>
 
@@ -19,7 +19,7 @@
 
 Slate is a **unified modular blockchain** designed to solve the scalability, security, and decentralization trilemma through innovative architecture. It serves as the foundational infrastructure for the next wave of decentralized applications, from global financial systems to high-performance Web3 experiences.
 
-🚀 **[Read the Technical Whitepaper](./WHITEPAPER.md)** | **[Explore Interactive Demo](./slate-whitepaper/)**
+🚀 **[Read the Technical Whitepaper](./WHITEPAPER.md)** | **[Explore Interactive Demo](https://slate-whitepaper-h5uf8dba4.vercel.app)**
 
 ## The Slate Advantage
 
