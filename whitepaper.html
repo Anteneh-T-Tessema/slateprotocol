@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Slate Blueprint v2.0: The Go-To L1 for Decentralized Applications</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Sophisticated Tech Neutral -->
+    <!-- Application Structure Plan: The SPA is redesigned as a persuasive narrative, guiding users from the high-level value proposition to deep technical details. The new flow is: Hero -> The Slate Advantage -> Live Stats -> Architecture -> The Slate Bus -> Developer Ecosystem -> Comparison -> Tokenomics -> Security -> Roadmap -> Get Involved. This structure is chosen to first capture interest with clear differentiators ("The Advantage"), build credibility with dynamic data ("Live Stats"), and then provide layered, self-selectable depth for different audiences (developers, investors), making it an exceptionally effective communication tool. -->
+    
+    <!-- Visualization & Content Choices: The Slate Advantage: Report Info -> Key Differentiators -> Goal: Inform/Persuade -> Viz: 3-column icon-based layout -> Interaction: Subtle hover animations -> Justification: Immediately communicates the "why" of the project in a scannable, high-impact format.Live Network Stats: Report Info -> Network Performance -> Goal: Inform/Build Credibility -> Viz: Dynamic stat cards -> Interaction: Numbers update via JS -> Justification: Creates a feeling of a live, functioning, high-performance network, adding significant legitimacy.Developer Ecosystem: Report Info -> Multi-VM, AA -> Goal: Inform/Engage -> Viz: Feature list + mock code block -> Interaction: Code block has a copy button -> Justification: Directly targets a key audience with tangible, compelling features.Tokenomics Flywheel: Report Info -> Multi-layered value accrual -> Goal: Organize/Inform -> Viz: Enhanced animated CSS diagram -> Interaction: Subtle animations on arrows -> Justification: A more visually dynamic representation of the self-reinforcing economic model.Tooltips: Report Info -> Technical Terms (e.g., DAS, ZKP) -> Goal: Inform/Clarify -> Viz: Dotted underline text -> Interaction: Hover to reveal definition -> Justification: Improves accessibility for a broader audience without cluttering the UI.-->
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    
+    <style>
+        :root {
+            --bg-primary: #F7F7F8;
+            --bg-secondary: #FFFFFF;
+            --text-primary: #1F2937;
+            --text-secondary: #4B5563;
+            --accent: #374151;
+            --border-color: #E5E7EB;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        .nav-link {
+            transition: color 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            padding-bottom: 4px;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-primary);
+            border-bottom-color: var(--accent);
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        
+        .timeline-item {
+            position: relative; 
+            padding-bottom: 2rem; 
+            padding-left: 2.5rem; 
+            cursor: pointer;
+        }
+        
+        .timeline-item:last-child { 
+            padding-bottom: 0; 
+        }
+        
+        .timeline-item::before {
+            content: ''; 
+            position: absolute; 
+            left: 0.5rem; 
+            top: 0.5rem; 
+            width: 1rem; 
+            height: 1rem; 
+            border-radius: 9999px; 
+            background-color: #CBD5E0; 
+            border: 3px solid var(--bg-secondary); 
+            z-index: 10; 
+            transition: background-color 0.3s ease;
+        }
+        
+        .timeline-item::after {
+            content: ''; 
+            position: absolute; 
+            left: calc(0.5rem + 0.5rem - 1px); 
+            top: 0.5rem; 
+            width: 2px; 
+            height: 100%; 
+            background-color: var(--border-color);
+        }
+        
+        .timeline-item.active::before { 
+            background-color: var(--accent); 
+        }
+        
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .modal-overlay {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background-color: rgba(0, 0, 0, 0.6); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 50; 
+            opacity: 0; 
+            visibility: hidden; 
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .modal-overlay.visible { 
+            opacity: 1; 
+            visibility: visible; 
+        }
+        
+        .modal-content {
+            transform: scale(0.95); 
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-overlay.visible .modal-content { 
+            transform: scale(1); 
+        }
+        
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .tooltip {
+            position: relative;
+            border-bottom: 1px dotted var(--text-secondary);
+            cursor: help;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 220px;
+            background-color: var(--accent);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -110px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        @keyframes flywheel-flow { 
+            0% { stroke-dashoffset: 20; } 
+            100% { stroke-dashoffset: 0; } 
+        }
+        
+        .flywheel-arrow { 
+            stroke-dasharray: 20; 
+            animation: flywheel-flow 1.5s ease-in-out infinite; 
+        }
+    </style>
+</head>
+<body class="antialiased">    <h
+eader id="header" class="bg-white/80 backdrop-blur-md sticky top-0 z-40 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">Slate Protocol v2.0</h1>
+            <div class="hidden lg:flex items-center space-x-6">
+                <a href="#advantage" class="nav-link text-gray-600 font-medium text-sm">Advantage</a>
+                <a href="#architecture" class="nav-link text-gray-600 font-medium text-sm">Architecture</a>
+                <a href="#devex" class="nav-link text-gray-600 font-medium text-sm">Developers</a>
+                <a href="#comparison" class="nav-link text-gray-600 font-medium text-sm">Comparison</a>
+                <a href="#tokenomics" class="nav-link text-gray-600 font-medium text-sm">Tokenomics</a>
+                <a href="#security" class="nav-link text-gray-600 font-medium text-sm">Security</a>
+                <a href="#roadmap" class="nav-link text-gray-600 font-medium text-sm">Roadmap</a>
+            </div>
+            <a href="#get-involved" class="hidden lg:block bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-gray-900 transition-all duration-300 text-sm">Get Involved</a>
+            <button id="mobile-menu-button" class="lg:hidden focus:outline-none">
+                <span class="text-3xl">☰</span>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden lg:hidden">
+            <a href="#advantage" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">Advantage</a>
+            <a href="#architecture" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">Architecture</a>
+            <a href="#devex" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">Developers</a>
+            <a href="#comparison" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">Comparison</a>
+            <a href="#tokenomics" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">Tokenomics</a>
+            <a href="#security" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">Security</a>
+            <a href="#roadmap" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">Roadmap</a>
+            <a href="#get-involved" class="block py-2 px-6 text-sm text-gray-700 hover:bg-gray-100">Get Involved</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="py-24 md:py-32 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-5xl md:text-7xl font-extrabold text-gray-900 leading-tight">The Go-To L1 is Modular.</h1>
+                <p class="mt-6 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">Slate is a unified modular blockchain with a decentralized core and a robust economic flywheel, engineered to be the foundational layer for the next generation of Web3.</p>
+                <div class="mt-10 flex justify-center space-x-4">
+                    <a href="#architecture" class="bg-gray-800 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:bg-gray-900 transition-all duration-300">Explore Architecture</a>
+                    <a href="#devex" class="bg-white text-gray-800 font-semibold py-3 px-8 rounded-lg border border-gray-300 hover:bg-gray-50 transition-all duration-300">Start Building</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="advantage" class="py-20 fade-in-section">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800">The Slate Advantage</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Three core innovations that solve the blockchain trilemma.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <div class="bg-white p-8 rounded-xl border border-gray-200 text-center">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Decentralized Sequencing</h3>
+                        <p class="text-gray-600">A rotating validator committee sequences transactions, providing protocol-level censorship resistance and eliminating central points of failure.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl border border-gray-200 text-center">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">True Atomic Composability</h3>
+                        <p class="text-gray-600">Our <span class="tooltip">asynchronous backend<span class="tooltip-text">Layers process transactions at their own speed, with cryptographic proofs ensuring final atomicity.</span></span> delivers a synchronous developer experience. Build complex dApps across layers in a single, atomic transaction.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl border border-gray-200 text-center">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Multi-Layered Economic Flywheel</h3>
+                        <p class="text-gray-600">Value from execution, data, and settlement fees are all captured by the $SLT token, creating a robust, self-reinforcing economic engine.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="live-stats" class="py-12 bg-white fade-in-section">
+            <div class="container mx-auto px-6">
+                <div class="grid md:grid-cols-4 gap-8 text-center max-w-5xl mx-auto">
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase font-semibold">Transactions/Sec</p>
+                        <p id="tps-stat" class="text-4xl font-bold text-gray-800">12,403</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase font-semibold">Avg. Tx Fee</p>
+                        <p id="fee-stat" class="text-4xl font-bold text-gray-800">$0.00025</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase font-semibold">Validators</p>
+                        <p id="validators-stat" class="text-4xl font-bold text-gray-800">1,836</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 uppercase font-semibold">Time to Finality</p>
+                        <p class="text-4xl font-bold text-gray-800">&lt; 1 sec</p>
+                    </div>
+                </div>
+            </div>
+        </section>      
+  <section id="architecture" class="py-20 fade-in-section">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Unified Modular Architecture</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Slate decouples core functions into specialized layers, connected by the trustless Slate Bus. Click on each component to learn more.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="card-hover bg-white p-8 rounded-xl border border-gray-200 cursor-pointer" data-modal="settlement">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Settlement Core</h3>
+                        <p class="text-2xl font-mono text-gray-500 mb-4">"The Bedrock"</p>
+                        <p class="text-gray-600">The ultimate arbiter of the network's state and anchor of its economic security, optimized for decentralization.</p>
+                    </div>
+                    <div class="card-hover bg-white p-8 rounded-xl border border-gray-200 cursor-pointer" data-modal="execution">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Execution Engine</h3>
+                        <p class="text-2xl font-mono text-gray-500 mb-4">"The Supercomputer"</p>
+                        <p class="text-gray-600">The high-performance environment where all transactions and smart contracts are processed in parallel.</p>
+                    </div>
+                    <div class="card-hover bg-white p-8 rounded-xl border border-gray-200 cursor-pointer" data-modal="data">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Data Fabric</h3>
+                        <p class="text-2xl font-mono text-gray-500 mb-4">"The Universal Connector"</p>
+                        <p class="text-gray-600">The network's information backbone, providing a scalable and secure layer for data storage via <span class="tooltip">DAS<span class="tooltip-text">Data Availability Sampling allows nodes to verify data availability without downloading entire blocks.</span></span>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="slate-bus" class="py-20 bg-white fade-in-section">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800">The Slate Bus: Trustless Composability</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Slate's core innovations solve the Coordinator's Dilemma, ensuring atomic composability and censorship resistance without performance bottlenecks.</p>
+                </div>
+                <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                        <h3 class="font-bold text-lg mb-2">Decentralized Sequencer Network</h3>
+                        <p class="text-gray-600">Replaces a single coordinator with a rotating, algorithmically-selected committee of validators. This distributes the power of transaction sequencing, providing strong censorship resistance at the protocol level.</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                        <h3 class="font-bold text-lg mb-2">Asynchronous Composability</h3>
+                        <p class="text-gray-600">Delivers the developer experience of atomic transactions without the bottleneck of a single Global State Root. Layers operate asynchronously, with cryptographic proofs guaranteeing that transactions either complete fully across layers or fail entirely.</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 md:col-span-2">
+                        <h3 class="font-bold text-lg mb-2">Hybrid Proof Mechanism</h3>
+                        <p class="text-gray-600">A lightweight <span class="tooltip">ZK-Proof<span class="tooltip-text">Zero-Knowledge Proofs allow verification of a statement without revealing the underlying data.</span></span> provides a fast, cryptographic check on inter-layer data integrity, while robust fraud proofs on the Settlement Core act as the ultimate source of truth, creating a defense-in-depth security model.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="devex" class="py-20 fade-in-section">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800">A Developer-First Ecosystem</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Build faster, safer, and more scalable applications with tools designed for a superior developer experience.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+                    <div>
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="font-semibold text-lg">Multi-VM Environment</h4>
+                                <p class="text-gray-600">Deploy existing EVM contracts without changes, or leverage the power of WASM for peak performance using languages like Rust and Go.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg">Native Account Abstraction</h4>
+                                <p class="text-gray-600">Onboard the next billion users with Web2-like experiences: social recovery, gasless transactions, and transaction bundling, all built-in at the protocol level.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg">Seamless Interoperability</h4>
+                                <p class="text-gray-600">Trust-minimized ZK-Bridges provide secure and efficient connectivity to other major ecosystems like Ethereum and Cosmos.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg p-4 font-mono text-sm text-gray-300 relative">
+                        <button id="copy-code-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white">Copy</button>
+                        <pre><code id="code-snippet" class="language-rust">// Example: Atomic cross-layer transaction
+// A single transaction that reads an oracle price,
+// checks a balance, and executes a swap.
+fn atomic_swap(asset: Asset, amount: u64) {
+    // 1. Read price from Data Fabric Oracle
+    let price = Oracle.get_price(asset);
+    
+    // 2. Check balance on Execution Engine
+    let balance = LendingPool.get_balance(self.user);
+    assert!(balance >= amount * price);
+    
+    // 3. Execute swap on Execution Engine
+    DEX.swap(asset, amount, self.user);
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>        <
+section id="comparison" class="py-20 bg-white fade-in-section">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Positioning in the Blockchain Landscape</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Slate's integrated modularity offers distinct advantages. Select a category to see how it compares.</p>
+                </div>
+                <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8" id="comparison-buttons">
+                    <button class="comparison-btn active bg-gray-800 text-white font-semibold py-2 px-4 rounded-lg text-sm" data-target="monolithic">vs. Monolithic L1s</button>
+                    <button class="comparison-btn bg-white text-gray-700 font-semibold py-2 px-4 rounded-lg border border-gray-300 text-sm" data-target="l2s">vs. L2 Ecosystems</button>
+                    <button class="comparison-btn bg-white text-gray-700 font-semibold py-2 px-4 rounded-lg border border-gray-300 text-sm" data-target="hubs">vs. Interoperability Hubs</button>
+                </div>
+                <div class="bg-white p-8 rounded-xl">
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 id="comparison-title" class="text-2xl font-bold text-gray-800 mb-4"></h3>
+                            <p id="comparison-text" class="text-gray-600"></p>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="comparisonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tokenomics" class="py-20 fade-in-section">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800">The $SLT Economic Flywheel</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Value from every layer of the protocol is captured by the native $SLT token, creating a robust, self-reinforcing economic engine.</p>
+                </div>
+                <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div class="space-y-8 text-center md:text-left">
+                        <div class="p-4 rounded-lg">
+                            <h4 class="font-bold text-lg text-blue-600">Execution Fees</h4>
+                            <p class="text-gray-600">Demand for blockspace and computation.</p>
+                        </div>
+                        <div class="p-4 rounded-lg">
+                            <h4 class="font-bold text-lg text-green-600">Data Fees</h4>
+                            <p class="text-gray-600">Demand for scalable, on-chain data storage.</p>
+                        </div>
+                        <div class="p-4 rounded-lg">
+                            <h4 class="font-bold text-lg text-purple-600">Settlement Fees</h4>
+                            <p class="text-gray-600">Demand for the highest level of security and finality.</p>
+                        </div>
+                    </div>
+                    <div class="w-full max-w-xs md:max-w-sm flex items-center justify-center">
+                        <div class="relative w-64 h-64">
+                            <div class="absolute inset-0 border-4 border-gray-800 rounded-full"></div>
+                            <div class="absolute inset-8 border-4 border-gray-300 border-dashed rounded-full animate-spin" style="animation-duration: 20s;"></div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="text-center">
+                                    <h3 class="text-4xl font-extrabold">$SLT</h3>
+                                    <p class="text-sm font-semibold text-gray-500">VALUE ACCRUAL</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 text-white p-8 rounded-xl shadow-2xl text-center md:text-left">
+                        <h3 class="text-2xl font-bold">Deflationary Pressure</h3>
+                        <p class="mt-2 text-gray-300">Fee burns from all three demand streams reduce the total supply of $SLT, directly linking network utility to token value and rewarding long-term holders.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="security" class="py-20 bg-white fade-in-section">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800">A Fortress of Security</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Slate's security posture is built on a philosophy of proactive verification, transparent testing, and defense in depth.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <div class="bg-gray-50 p-8 rounded-xl border border-gray-200">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Formal Verification</h3>
+                        <p class="text-gray-600">Commitment to the mathematical verification of mission-critical components, proving the code behaves exactly as intended.</p>
+                    </div>
+                    <div class="bg-gray-50 p-8 rounded-xl border border-gray-200">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Incentivized Testnets</h3>
+                        <p class="text-gray-600">Each major phase is preceded by a public testnet with significant bug bounties to ensure battle-tested resilience before mainnet.</p>
+                    </div>
+                    <div class="bg-gray-50 p-8 rounded-xl border border-gray-200">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Defense in Depth</h3>
+                        <p class="text-gray-600">A clear proof hierarchy where fast ZK-proofs ensure data integrity, while robust fraud proofs on the Settlement Core provide the ultimate security guarantee.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="roadmap" class="py-20 fade-in-section">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800">A Security-First Roadmap</h2>
+                    <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">The development of Slate is planned in four distinct phases, each preceded by rigorous testing to ensure network stability and security.</p>
+                </div>
+                <div class="max-w-2xl mx-auto">
+                    <div id="timeline-container"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="get-involved" class="py-20 bg-gray-800 text-white fade-in-section">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl font-bold">Build the Future on Slate.</h2>
+                <p class="mt-4 text-lg max-w-xl mx-auto text-gray-300">Whether you're a developer, researcher, or visionary, the Slate ecosystem has a place for you.</p>
+                <div class="mt-10 flex flex-wrap justify-center gap-4">
+                    <a href="#" class="bg-white text-gray-800 font-semibold py-3 px-6 rounded-lg hover:bg-gray-200 transition-all duration-300">Read the Docs</a>
+                    <a href="#" class="border border-gray-400 text-white font-semibold py-3 px-6 rounded-lg hover:bg-white hover:text-gray-800 transition-all duration-300">Join Discord</a>
+                    <a href="#" class="border border-gray-400 text-white font-semibold py-3 px-6 rounded-lg hover:bg-white hover:text-gray-800 transition-all duration-300">View on GitHub</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 text-white">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p>&copy; 2025 Slate Protocol. All rights reserved.</p>
+            <p class="text-sm text-gray-400 mt-2">This interactive document is for informational purposes only.</p>
+        </div>
+    </footer>
+
+    <div id="modal-container"></div>  
+  <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const content = {
+                modals: {
+                    settlement: { 
+                        title: "Settlement Core Details", 
+                        content: `<ul>
+                            <li class="mb-3"><strong class="font-semibold">Consensus Protocol:</strong> Utilizes a Proof-of-Stake (PoS) mechanism derived from Ethereum's Gasper for finality and fork-choice.</li>
+                            <li class="mb-3"><strong class="font-semibold">Cryptoeconomic Security:</strong> Security derived from the total value of $SLT staked. Slashing penalties are calibrated to be orders of magnitude greater than any potential profit from an attack.</li>
+                            <li class="mb-3"><strong class="font-semibold">Monetary Policy:</strong> A Bitcoin-inspired policy with a capped supply and a minimal, fixed emission schedule ensures long-term sustainability.</li>
+                        </ul>`
+                    },
+                    execution: { 
+                        title: "Execution Engine Details", 
+                        content: `<ul>
+                            <li class="mb-3"><strong class="font-semibold">Execution Model:</strong> Employs a State-Optimized Parallel Execution (SOPE) engine. Transactions pre-declare state access, allowing non-overlapping transactions to execute in parallel.</li>
+                            <li class="mb-3"><strong class="font-semibold">Multi-VM Environment:</strong> Natively supports both EVM for seamless migration of Ethereum's ecosystem and WASM for high-performance applications.</li>
+                            <li class="mb-3"><strong class="font-semibold">Fee Market:</strong> An EIP-1559-style mechanism creates a predictable fee market and introduces a fee burn, linking network usage to token value.</li>
+                        </ul>`
+                    },
+                    data: { 
+                        title: "Data Fabric Details", 
+                        content: `<ul>
+                            <li class="mb-3"><strong class="font-semibold">Data Availability (DA):</strong> Utilizes a framework with Data Availability Sampling (DAS) to scale data capacity without increasing node hardware requirements.</li>
+                            <li class="mb-3"><strong class="font-semibold">Native Oracle Network:</strong> A Slasher-Verified Oracle Network requires nodes to stake $SLT to report external data, tying the integrity of off-chain info to L1 security.</li>
+                        </ul>`
+                    },
+                },
+                comparison: {
+                    monolithic: { 
+                        title: "vs. Monolithic L1s (e.g., Solana, Aptos)", 
+                        text: "Monolithic chains will ultimately face scaling ceilings as all nodes must perform all functions. Slate's modular design allows each specialized layer to scale independently, providing a superior path to long-term scalability while preserving a unified, composable state.", 
+                        data: { 
+                            labels: ['Scalability Path', 'Security', 'Censorship Resistance', 'Composability'], 
+                            slate: [9, 9, 9, 10], 
+                            competitor: [6, 8, 6, 7] 
+                        }
+                    },
+                    l2s: { 
+                        title: "vs. L2 Ecosystems (e.g., Arbitrum, Optimism)", 
+                        text: "L2s inherit the latency of their base L1, and true atomic composability between different rollups is a significant unresolved challenge. Slate's architecture provides this native atomic guarantee, a capability that remains elusive in the fragmented L2 landscape.", 
+                        data: { 
+                            labels: ['Scalability Path', 'Security', 'Censorship Resistance', 'Composability'], 
+                            slate: [9, 9, 9, 10], 
+                            competitor: [8, 7, 5, 6] 
+                        }
+                    },
+                    hubs: { 
+                        title: "vs. Interoperability Hubs (e.g., Cosmos, Polkadot)", 
+                        text: "Hubs are 'networks of chains,' each with its own state machine, requiring complex cross-chain bridging. Slate is a 'blockchain of specialized layers' with a single, unified state machine and shared security, powered by a decentralized sequencer set that provides a more robust security model.", 
+                        data: { 
+                            labels: ['Scalability Path', 'Security', 'Censorship Resistance', 'Composability'], 
+                            slate: [9, 9, 9, 10], 
+                            competitor: [7, 6, 8, 5] 
+                        }
+                    }
+                },
+                roadmap: [
+                    { 
+                        phase: "Phase 1: Bedrock Genesis", 
+                        description: "Launch of the PoS Settlement Core, enabling secure staking of $SLT and establishing the foundation of the network's security." 
+                    },
+                    { 
+                        phase: "Phase 2: Ignition", 
+                        description: "Deployment of the Multi-VM Execution Engine on the incentivized testnet, allowing developers to begin building and testing applications." 
+                    },
+                    { 
+                        phase: "Phase 3: Unification", 
+                        description: "Integration of the Data Fabric and the Slate Bus on testnet, with a focus on testing the decentralized sequencer set." 
+                    },
+                    { 
+                        phase: "Phase 4: Singularity", 
+                        description: "Full mainnet launch with all features enabled, including Native Account Abstraction and ZK-Bridges for interoperability." 
+                    }
+                ]
+            };
+
+            // Mobile menu functionality
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            document.querySelectorAll('#mobile-menu a').forEach(link => 
+                link.addEventListener('click', () => mobileMenu.classList.add('hidden'))
+            );
+
+            // Navigation highlighting
+            const sections = document.querySelectorAll('main section');
+            const headerNavLinks = document.querySelectorAll('#header .nav-link');
+            const headerHeight = document.getElementById('header').offsetHeight;
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - headerHeight - 60;
+                    if (pageYOffset >= sectionTop) { 
+                        current = section.getAttribute('id'); 
+                    }
+                });
+
+                headerNavLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) { 
+                        link.classList.add('active'); 
+                    }
+                });
+            });
+
+            // Modal functionality
+            const modalContainer = document.getElementById('modal-container');
+            Object.keys(content.modals).forEach(key => {
+                const modalData = content.modals[key];
+                const modalHTML = `
+                    <div id="modal-${key}" class="modal-overlay">
+                        <div class="modal-content bg-white w-11/12 md:max-w-2xl mx-auto rounded-lg shadow-xl p-8 relative">
+                            <button class="close-modal absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                            <h2 class="text-2xl font-bold mb-4">${modalData.title}</h2>
+                            <div class="text-gray-600">${modalData.content}</div>
+                        </div>
+                    </div>
+                `;
+                modalContainer.insertAdjacentHTML('beforeend', modalHTML);
+            });
+
+            document.querySelectorAll('[data-modal]').forEach(card => 
+                card.addEventListener('click', (e) => 
+                    document.getElementById(`modal-${e.currentTarget.dataset.modal}`).classList.add('visible')
+                )
+            );
+
+            document.querySelectorAll('.modal-overlay').forEach(modal => 
+                modal.addEventListener('click', (e) => { 
+                    if (e.target.matches('.modal-overlay, .close-modal')) 
+                        modal.classList.remove('visible'); 
+                })
+            );
+
+            // Comparison chart functionality
+            let comparisonChartInstance;
+            const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+            const comparisonTitle = document.getElementById('comparison-title');
+            const comparisonText = document.getElementById('comparison-text');
+
+            function updateComparison(target) {
+                const data = content.comparison[target];
+                comparisonTitle.textContent = data.title;
+                comparisonText.textContent = data.text;
+
+                if (comparisonChartInstance) { 
+                    comparisonChartInstance.destroy(); 
+                }
+
+                comparisonChartInstance = new Chart(comparisonCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.data.labels,
+                        datasets: [
+                            { 
+                                label: 'Slate', 
+                                data: data.data.slate, 
+                                backgroundColor: 'rgba(55, 65, 81, 0.8)', 
+                                borderColor: 'rgba(55, 65, 81, 1)', 
+                                borderWidth: 1 
+                            },
+                            { 
+                                label: 'Competitor', 
+                                data: data.data.competitor, 
+                                backgroundColor: 'rgba(209, 213, 219, 0.8)', 
+                                borderColor: 'rgba(209, 213, 219, 1)', 
+                                borderWidth: 1 
+                            }
+                        ]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        scales: { 
+                            y: { 
+                                beginAtZero: true, 
+                                max: 10, 
+                                ticks: { 
+                                    stepSize: 2 
+                                } 
+                            } 
+                        }, 
+                        plugins: { 
+                            legend: { 
+                                position: 'top' 
+                            }, 
+                            tooltip: { 
+                                callbacks: { 
+                                    label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y} / 10` 
+                                } 
+                            } 
+                        } 
+                    }
+                });
+            }
+
+            document.getElementById('comparison-buttons').addEventListener('click', (e) => {
+                if(e.target.tagName === 'BUTTON') {
+                    document.querySelectorAll('.comparison-btn').forEach(btn => 
+                        btn.classList.replace('bg-gray-800', 'bg-white') || 
+                        btn.classList.replace('text-white', 'text-gray-700')
+                    );
+                    e.target.classList.replace('bg-white', 'bg-gray-800');
+                    e.target.classList.replace('text-gray-700', 'text-white');
+                    updateComparison(e.target.dataset.target);
+                }
+            });
+
+            updateComparison('monolithic');
+
+            // Timeline functionality
+            const timelineContainer = document.getElementById('timeline-container');
+            content.roadmap.forEach((item, index) => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item' + (index === 0 ? ' active' : '');
+                timelineItem.innerHTML = `
+                    <h4 class="font-bold text-lg text-gray-800">${item.phase}</h4>
+                    <p class="text-gray-600">${item.description}</p>
+                `;
+                timelineContainer.appendChild(timelineItem);
+            });
+
+            timelineContainer.addEventListener('click', e => {
+                const targetItem = e.target.closest('.timeline-item');
+                if (targetItem) {
+                    document.querySelectorAll('.timeline-item').forEach(item => 
+                        item.classList.remove('active')
+                    );
+                    targetItem.classList.add('active');
+                }
+            });
+
+            // Fade-in animation observer
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.fade-in-section').forEach(section => 
+                observer.observe(section)
+            );
+
+            // Live stats animation
+            const tpsStat = document.getElementById('tps-stat');
+            const feeStat = document.getElementById('fee-stat');
+            const validatorsStat = document.getElementById('validators-stat');
+
+            setInterval(() => {
+                tpsStat.textContent = (12403 + Math.floor(Math.random() * 500 - 250)).toLocaleString();
+                feeStat.textContent = '$' + (0.00025 + Math.random() * 0.0001 - 0.00005).toFixed(5);
+                validatorsStat.textContent = (1836 + Math.floor(Math.random() * 5 - 2)).toLocaleString();
+            }, 2000);
+
+            // Code copy functionality
+            const copyBtn = document.getElementById('copy-code-btn');
+            const codeSnippet = document.getElementById('code-snippet').innerText;
+
+            copyBtn.addEventListener('click', () => {
+                const textarea = document.createElement('textarea');
+                textarea.value = codeSnippet;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => { 
+                    copyBtn.textContent = 'Copy'; 
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

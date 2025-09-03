@@ -1,0 +1,17 @@
+[package]
+name = "slateprotocol"
+version = "0.1.0"
+edition = "2021"
+authors = ["Anteneh T. Tessema <anteneh@slateprotocol.org>"]
+description = "Slate Protocol - The Go-To L1 for Decentralized Applications"
+license = "MIT"
+repository = "https://github.com/Anteneh-T-Tessema/slateprotocol"
+homepage = "https://slate-protocol.org"
+documentation = "https://github.com/Anteneh-T-Tessema/slateprotocol#readme"
+keywords = ["blockchain", "cryptocurrency", "web3", "defi", "layer1"]
+categories = ["cryptography", "network-programming"]
+readme = "README.md"
+
+[dependencies]
+
+[dev-dependencies]
